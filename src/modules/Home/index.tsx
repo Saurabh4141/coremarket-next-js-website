@@ -10,8 +10,9 @@ import { BlogSection } from "@/components/homeSections/BlogSection";
 import { FAQSection } from "@/components/homeSections/FAQSection";
 import { ContactSection } from "@/components/homeSections/ContactSection";
 import { AnimatedSection } from "@/components/ui/AnimatedSection";
+import type { BlogPostDTO } from "@/lib/services/blogs";
 
-const Index = () => {
+const Index = ({ blogPosts }: { blogPosts?: BlogPostDTO[] }) => {
   return (
     <PageLayout>
       <HeroSection />
@@ -19,7 +20,7 @@ const Index = () => {
       <ServicesSection />
       <ReportsSection />
       <AboutSection />
-      <BlogSection />
+      <BlogSection posts={blogPosts} />
       <FAQSection />
       <ContactSection />
     </PageLayout>

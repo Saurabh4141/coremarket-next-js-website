@@ -2,8 +2,9 @@ import { ArrowRight, Calendar, Clock, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { AnimatedSection, StaggerContainer, StaggerItem } from "@/components/ui/AnimatedSection";
 import Link from "next/link";
+import type { BlogPostDTO } from "@/lib/services/blogs";
 
-const blogPosts = [
+const fallbackBlogPosts = [
   {
     title: "The Future of AI in Market Research: Trends to Watch in 2024",
     excerpt: "Artificial intelligence is revolutionizing how we gather and analyze market data. Discover the key trends shaping the future of research.",
@@ -34,9 +35,11 @@ const blogPosts = [
   },
 ];
 
-export const BlogSection = () => {
-  const featuredPost = blogPosts.find((post) => post.featured);
-  const regularPosts = blogPosts.filter((post) => !post.featured);
+export const BlogSection = ({ posts }: { posts?: BlogPostDTO[] }) => {
+  // Home shows up to 3: one featured + two regular.
+  const source = posts && posts.length ? posts.slice(0, 3) : fallbackBlogPosts;
+  const featuredPost = source.find((post) => post.featured) ?? source[0];
+  const regularPosts = source.filter((post) => post !== featuredPost).slice(0, 2);
 
   return (
     <section id="blog" className="py-8 md:py-12 bg-background relative overflow-hidden">

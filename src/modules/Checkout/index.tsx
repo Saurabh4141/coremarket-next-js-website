@@ -18,7 +18,7 @@ import {
   Download
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { reportsData, getReportBySlug } from "@/data/reports";
+import { reportsData, getReportBySlug, type Report } from "@/data/reports";
 import { 
   licenseTypes, 
   currencies, 
@@ -28,18 +28,19 @@ import {
   getDefaultCurrency
 } from "@/data/pricing";
 
-const Checkout = () => {
+const Checkout = ({ report: reportProp }: { report?: Report } = {}) => {
   const { slug } = useParams<{ slug: string }>();
   const searchParams = useSearchParams();
-  
-  // Get report data
+
+  // Get report data — server-provided DB report wins, else static lookup.
   const report = useMemo(() => {
+    if (reportProp) return reportProp;
     if (slug) {
       return getReportBySlug(slug);
     }
     // Fallback to first report if no slug
     return reportsData[0];
-  }, [slug]);
+  }, [reportProp, slug]);
 
   // State
   const [selectedLicense, setSelectedLicense] = useState(

@@ -10,10 +10,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { PaginationControls } from "@/components/ui/PaginationControls";
 import { BlogFilterSidebar, FloatingBlogFilterButton } from "@/components/filters/BlogFilterSidebar";
+import type { BlogPostDTO } from "@/lib/services/blogs";
 
 const categories = ["All", "Industry Insights", "Research Methods", "AI & Technology", "Case Studies"];
 
-const blogPosts = [
+const fallbackBlogPosts = [
   {
     title: "The Future of AI in Market Research: Trends to Watch in 2024",
     slug: "future-of-ai-market-research-2024",
@@ -117,7 +118,8 @@ const blogPosts = [
   },
 ];
 
-const Blog = () => {
+const Blog = ({ posts }: { posts?: BlogPostDTO[] }) => {
+  const blogPosts = posts && posts.length ? posts : fallbackBlogPosts;
   const [activeCategory, setActiveCategory] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -130,7 +132,7 @@ const Blog = () => {
       const matchesSearch = post.title.toLowerCase().includes(searchQuery.toLowerCase());
       return matchesCategory && matchesSearch;
     });
-  }, [activeCategory, searchQuery]);
+  }, [activeCategory, searchQuery, blogPosts]);
 
   // Pagination
   const totalItems = filteredPosts.length;

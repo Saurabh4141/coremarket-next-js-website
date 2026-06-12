@@ -16,6 +16,7 @@ import {
   getReportDetailBySlug,
   getReportDetailByPath,
   getDefaultReportDetail,
+  type ReportDetail as ReportDetailData,
 } from '@/data/reportDetails';
 import { reportsData } from '@/data/reports';
 import { generateReportSections, getVisibleSections } from '@/data/reportSections';
@@ -23,7 +24,7 @@ import { useScrollSpy } from '@/hooks/useScrollSpy';
 
 const SIDEBAR_STORAGE_KEY = 'report_sidebar_visible';
 
-const ReportDetail = () => {
+const ReportDetail = ({ report: reportProp }: { report?: ReportDetailData } = {}) => {
   // Route is a catch-all (/report/[...segments]) covering both URL shapes:
   // /report/:slug and /report/:industry/:subIndustry/:reportSlug
   const params = useParams<{ segments?: string[] }>();
@@ -61,6 +62,9 @@ const ReportDetail = () => {
 
   // Get report data based on route params
   const report = useMemo(() => {
+    // Server-provided DB report (with static sub-sections merged in) wins.
+    if (reportProp) return reportProp;
+
     // Try nested route first: /report/:industry/:subIndustry/:reportSlug
     if (industry && subIndustry && reportSlug) {
       const found = getReportDetailByPath(industry, subIndustry, reportSlug);
@@ -111,7 +115,7 @@ const ReportDetail = () => {
     
     // Fallback to first report
     return reportDetailsData[0];
-  }, [slug, industry, subIndustry, reportSlug]);
+  }, [reportProp, slug, industry, subIndustry, reportSlug]);
 
   // Generate sections for this report - always returns array
   const sections = useMemo(() => {

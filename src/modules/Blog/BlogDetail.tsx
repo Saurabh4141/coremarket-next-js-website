@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { useParams } from "next/navigation";
 import { PageLayout } from "@/components/layout/PageLayout";
 import { AnimatedSection } from "@/components/ui/AnimatedSection";
 import {
@@ -19,8 +18,8 @@ import { AuthorBio } from "@/components/blog/AuthorBio";
 import { RelatedArticles } from "@/components/blog/RelatedArticles";
 import { NewsletterCTA } from "@/components/blog/NewsletterCTA";
 
-// Mock blog data - in production would come from API
-const blogData = {
+// Fallback used only if a server-provided article is not passed.
+const fallbackBlogData = {
   title: "The Future of Consumer Behavior in 2024",
   category: "Consumer Insights",
   author: {
@@ -129,8 +128,24 @@ const blogData = {
   ],
 };
 
-const BlogDetail = () => {
-  const { slug } = useParams();
+export interface BlogDetailView {
+  title: string;
+  category: string;
+  author: { name: string; role: string; avatar: string; bio: string };
+  publishDate: string;
+  readTime: string;
+  image: string;
+  content: {
+    introduction: string;
+    sections: { title: string; content: string; bullets?: string[]; keyPoints?: string[]; image?: string }[];
+    keyTakeaways: string[];
+    quote: { text: string; author: string; role: string };
+  };
+  relatedPosts: { title: string; slug: string; category: string; image: string; excerpt: string }[];
+}
+
+const BlogDetail = ({ data }: { data?: BlogDetailView }) => {
+  const blogData: BlogDetailView = data ?? fallbackBlogData;
 
   return (
     <PageLayout>

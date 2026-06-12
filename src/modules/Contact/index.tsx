@@ -8,6 +8,7 @@ import { Send, MapPin, Phone, Mail, Clock, CheckCircle2, ChevronRight } from "lu
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { submitRequest } from "@/lib/submitRequest";
 import Link from "next/link";
 import { companyInfo } from "@/data/companyInfo";
 
@@ -73,8 +74,18 @@ const Contact = () => {
   });
   const [isSubmitted, setIsSubmitted] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    // Persist the enquiry to the DB (request_master) via the API.
+    await submitRequest({
+      type: "contact",
+      name: formData.name,
+      email: formData.email,
+      phone: formData.phone,
+      firmName: formData.company,
+      subject: formData.subject,
+      message: formData.message,
+    });
     setIsSubmitted(true);
     setTimeout(() => setIsSubmitted(false), 3000);
   };
