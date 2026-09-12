@@ -25,7 +25,26 @@ import {
   reportsData,
   getReportsByIndustry,
   getReportsBySubIndustry,
+  type Report,
 } from "@/data/reports";
+
+/** One report row -> the shape this list renders. `category` is filled in by
+ *  the caller, since it depends on how the page was reached. */
+const toReportCard = (r: Report) => ({
+  title: r.title,
+  slug: r.slug,
+  date: r.date,
+  growth: r.growth,
+  pages: r.pages,
+  price: r.price,
+  industrySlug: r.industry,
+  subIndustrySlug: r.sub_industry,
+  market_size: r.market_size,
+  forecast_size: r.forecast_size,
+  forecast_period: r.forecast_period,
+  regions_covered: r.regions_covered,
+  major_players: r.major_players,
+});
 
 // Category color mapping
 const categoryColors: Record<string, string> = {
@@ -198,74 +217,22 @@ const IndustryReportsList = memo(() => {
   const subIndustryResult = slug ? getSubIndustryBySlug(slug) : null;
   const industryResult = slug ? getIndustryBySlug(slug) : null;
 
-  // Get all reports with category info
-  const allReports = useMemo(
-    () =>
-      reportsData.map((r) => ({
-        title: r.title,
-        slug: r.slug,
-        date: r.date,
-        growth: r.growth,
-        pages: r.pages,
-        price: r.price,
-        category: r.sub_industry || r.industry,
-        industrySlug: r.industry,
-        subIndustrySlug: r.sub_industry,
-        market_size: r.market_size,
-        forecast_size: r.forecast_size,
-        forecast_period: r.forecast_period,
-        regions_covered: r.regions_covered,
-        major_players: r.major_players,
-      })),
-    [],
-  );
-
-  // Determine which reports to show based on slug
+  // Which reports to show, and what to label their category as, depends on
+  // whether the slug is a sub-industry, a main industry, or missing entirely.
   const baseReports = useMemo(() => {
-    if (slug) {
-      // Check if it's a sub-industry
-      if (subIndustryResult) {
-        const subReports = getReportsBySubIndustry(slug);
-        return subReports.map((r) => ({
-          title: r.title,
-          slug: r.slug,
-          date: r.date,
-          growth: r.growth,
-          pages: r.pages,
-          price: r.price,
-          category: subIndustryResult.name,
-          industrySlug: r.industry,
-          subIndustrySlug: r.sub_industry,
-          market_size: r.market_size,
-          forecast_size: r.forecast_size,
-          forecast_period: r.forecast_period,
-          regions_covered: r.regions_covered,
-          major_players: r.major_players,
-        }));
-      }
-      // Check if it's a main industry
-      if (industryResult) {
-        const indReports = getReportsByIndustry(slug);
-        return indReports.map((r) => ({
-          title: r.title,
-          slug: r.slug,
-          date: r.date,
-          growth: r.growth,
-          pages: r.pages,
-          price: r.price,
-          category: detail?.title || industryResult.name,
-          industrySlug: r.industry,
-          subIndustrySlug: r.sub_industry,
-          market_size: r.market_size,
-          forecast_size: r.forecast_size,
-          forecast_period: r.forecast_period,
-          regions_covered: r.regions_covered,
-          major_players: r.major_players,
-        }));
-      }
-    }
-    return allReports;
-  }, [slug, detail, subIndustryResult, industryResult, allReports]);
+    const source = (() => {
+      if (slug && subIndustryResult)
+        return { reports: getReportsBySubIndustry(slug), category: subIndustryResult.name };
+      if (slug && industryResult)
+        return { reports: getReportsByIndustry(slug), category: detail?.title || industryResult.name };
+      return { reports: reportsData, category: null };
+    })();
+
+    return source.reports.map((r) => ({
+      ...toReportCard(r),
+      category: source.category ?? (r.sub_industry || r.industry),
+    }));
+  }, [slug, detail, subIndustryResult, industryResult]);
 
   // Filter reports based on search
   const filteredReports = useMemo(() => {

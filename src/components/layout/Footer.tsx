@@ -8,8 +8,7 @@ import {
   MapPin,
   Phone
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { NewsletterForm } from "@/components/NewsletterForm";
 import { companyInfo } from "@/data/companyInfo";
 import Logo from "@/assets/logo-clean.png";
 
@@ -27,18 +26,18 @@ const XIcon = ({ className }: { className?: string }) => (
 
 const footerLinks = {
   services: [
-    { label: "Market Opportunity", href: "/services/market-opportunity" },
-    { label: "Segmentation Analysis", href: "/services/segmentation-analysis" },
-    { label: "Pricing Strategy", href: "/services/pricing-strategy" },
-    { label: "Consumer Behavior", href: "/services/consumer-behavior" },
+    { label: "Market Opportunity", href: "/services/market-opportunity-identification" },
+    { label: "Segmentation Analysis", href: "/services/market-segmentation-analysis" },
+    { label: "Pricing Strategy", href: "/services/pricing-strategy-research" },
+    { label: "Consumer Behavior", href: "/services/consumer-behavior-analysis" },
     { label: "Competitor Analysis", href: "/services/competitor-analysis" },
   ],
   industries: [
-    { label: "Healthcare", href: "/industry/healthcare-it-services" },
-    { label: "Technology", href: "/industry/technology" },
-    { label: "Consumer Goods", href: "/industry/consumer-products" },
+    { label: "Healthcare", href: "/industry/healthcare" },
+    { label: "Technology", href: "/industry/information-communications-technology" },
+    { label: "Consumer Goods", href: "/industry/consumer-goods-fmcg" },
     { label: "Energy", href: "/industry/energy-power" },
-    { label: "Finance", href: "/industry/financial-services" },
+    { label: "Finance", href: "/industry/bfsi" },
   ],
   company: [
     { label: "About Us", href: "/about" },
@@ -79,16 +78,15 @@ export const Footer = () => {
                 Subscribe to our newsletter for the latest insights and reports.
               </p>
             </div>
-            <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
-              <Input
-                type="email"
-                placeholder="Enter your email"
-                className="h-12 w-full sm:w-80 bg-background/10 border-background/20 text-background placeholder:text-background/50 rounded-xl focus:border-accent"
+            <div className="w-full lg:w-auto">
+              <NewsletterForm
+                className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto"
+                inputClassName="h-12 w-full sm:w-80 bg-background/10 border-background/20 text-background placeholder:text-background/50 rounded-xl focus:border-accent"
+                buttonVariant="hero"
+                buttonClassName="whitespace-nowrap"
+                buttonIcon={<ArrowRight className="w-4 h-4" />}
+                source="Footer newsletter"
               />
-              <Button variant="hero" size="lg" className="whitespace-nowrap">
-                Subscribe
-                <ArrowRight className="w-4 h-4" />
-              </Button>
             </div>
           </div>
         </div>

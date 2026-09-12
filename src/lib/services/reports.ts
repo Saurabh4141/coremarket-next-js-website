@@ -90,11 +90,16 @@ export async function getReports(opts: {
   page?: number;
   pageSize?: number;
 } = {}): Promise<ReportListResult> {
-  const page = Math.max(1, opts.page ?? 1);
-  const pageSize = Math.min(50, Math.max(1, opts.pageSize ?? 9));
+  // Coerce to a whole number and fall back to the default: a non-numeric
+  // ?page=/?limit= would otherwise reach the SQL as NaN and throw.
+  const toInt = (v: number | undefined, fallback: number) =>
+    Number.isFinite(v) ? Math.floor(v as number) : fallback;
+
+  const page = Math.max(1, toInt(opts.page, 1));
+  const pageSize = Math.min(50, Math.max(1, toInt(opts.pageSize, 9)));
 
   const where: string[] = [];
-  const params: Record<string, unknown> = {};
+  const params: Record<string, string> = {};
   if (opts.industrySlug) { where.push("i.slug = :industry"); params.industry = opts.industrySlug; }
   if (opts.subIndustrySlug) { where.push("s.slug = :sub"); params.sub = opts.subIndustrySlug; }
   if (opts.search) { where.push("r.name LIKE :q"); params.q = `%${opts.search}%`; }

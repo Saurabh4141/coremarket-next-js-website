@@ -38,7 +38,7 @@ export const StickyMiniHeader: React.FC<StickyMiniHeaderProps> = ({
               <div className="flex items-center gap-3 text-xs text-gray-500">
                 <span>{report.cagr} CAGR</span>
                 <span className="hidden sm:inline">•</span>
-                <span className="hidden sm:inline">${report.base_year_value}</span>
+                <span className="hidden sm:inline">{report.base_year_value}</span>
               </div>
             </div>
 

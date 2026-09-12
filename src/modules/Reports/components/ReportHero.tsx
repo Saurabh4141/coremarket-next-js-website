@@ -103,7 +103,7 @@ export const ReportHero: React.FC<ReportHeroProps> = ({
               <div className="bg-white/10 backdrop-blur rounded-xl px-4 py-3 border border-white/10">
                 <div className="text-xs text-white/60 mb-1">Market Size ({report.base_year})</div>
                 <div className="text-xl sm:text-2xl font-bold text-white">
-                  ${report.base_year_value}
+                  {report.base_year_value}
                 </div>
               </div>
               <div className="bg-white/10 backdrop-blur rounded-xl px-4 py-3 border border-white/10">
@@ -115,7 +115,7 @@ export const ReportHero: React.FC<ReportHeroProps> = ({
               <div className="bg-white/10 backdrop-blur rounded-xl px-4 py-3 border border-white/10">
                 <div className="text-xs text-white/60 mb-1">Forecast Value ({report.forecast_year})</div>
                 <div className="text-xl sm:text-2xl font-bold text-white">
-                  ${report.forecast_year_value}
+                  {report.forecast_year_value}
                 </div>
               </div>
             </div>

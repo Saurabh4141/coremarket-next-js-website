@@ -57,7 +57,7 @@ const MarketSizeSection: React.FC<{ report: ReportDetail }> = ({ report }) => (
             <span className="text-xs text-gray-500">Market Size ({report.base_year})</span>
           </div>
           <div className="text-2xl sm:text-3xl font-bold text-gray-900">
-            <span className="text-[#1e3a5f]">${report.base_year_value}</span>
+            <span className="text-[#1e3a5f]">{report.base_year_value}</span>
           </div>
         </div>
         <div className="p-5 bg-gradient-to-br from-orange-50 to-white rounded-xl border border-orange-100">
@@ -74,7 +74,7 @@ const MarketSizeSection: React.FC<{ report: ReportDetail }> = ({ report }) => (
             <span className="text-xs text-gray-500">Forecast ({report.forecast_year})</span>
           </div>
           <div className="text-2xl sm:text-3xl font-bold text-gray-900">
-            <span className="text-green-600">${report.forecast_year_value}</span>
+            <span className="text-green-600">{report.forecast_year_value}</span>
           </div>
         </div>
       </div>
@@ -585,26 +585,30 @@ const FAQSection: React.FC<{ report: ReportDetail }> = ({ report }) => {
   );
 };
 
+/** section_key -> the component that renders it. Holding the components
+ *  (not rendered elements) means only the one section in use is built. */
+const SECTION_COMPONENTS: Record<string, React.FC<{ report: ReportDetail }>> = {
+  market_size_share: MarketSizeSection,
+  market_analysis: MarketAnalysisSection,
+  market_dynamics: MarketDynamicsSection,
+  trends_insights: TrendsSection,
+  segment_analysis: SegmentSection,
+  geography_analysis: GeographySection,
+  competitive_landscape: CompetitiveSection,
+  major_players: MajorPlayersSection,
+  industry_developments: DevelopmentsSection,
+  table_of_contents: TOCSection,
+  report_scope: ScopeSection,
+  faq: FAQSection,
+};
+
 // Main Section Content Component
 export const SectionContent: React.FC<SectionContentProps> = ({ report, section }) => {
-  const sectionComponents: Record<string, React.ReactNode> = {
-    market_size_share: <MarketSizeSection report={report} />,
-    market_analysis: <MarketAnalysisSection report={report} />,
-    market_dynamics: <MarketDynamicsSection report={report} />,
-    trends_insights: <TrendsSection report={report} />,
-    segment_analysis: <SegmentSection report={report} />,
-    geography_analysis: <GeographySection report={report} />,
-    competitive_landscape: <CompetitiveSection report={report} />,
-    major_players: <MajorPlayersSection report={report} />,
-    industry_developments: <DevelopmentsSection report={report} />,
-    table_of_contents: <TOCSection report={report} />,
-    report_scope: <ScopeSection report={report} />,
-    faq: <FAQSection report={report} />,
-  };
+  const Section = SECTION_COMPONENTS[section.section_key];
 
   return (
     <section id={section.section_key} className="scroll-mt-36">
-      {sectionComponents[section.section_key] || null}
+      {Section ? <Section report={report} /> : null}
     </section>
   );
 };

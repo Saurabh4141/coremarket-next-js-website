@@ -1,6 +1,5 @@
 import { Mail } from "lucide-react";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import { NewsletterForm } from "@/components/NewsletterForm";
 import { AnimatedSection } from "@/components/ui/AnimatedSection";
 
 export const NewsletterCTA = () => {
@@ -18,17 +17,13 @@ export const NewsletterCTA = () => {
             <p className="text-muted-foreground mb-8 max-w-lg mx-auto">
               Stay ahead of the competition with our weekly research updates, industry trends, and exclusive insights delivered straight to your inbox.
             </p>
-            <form className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
-              <Input
-                type="email"
+            <div className="max-w-md mx-auto">
+              <NewsletterForm
                 placeholder="Enter your email address"
-                className="flex-1 h-12 bg-card border-border"
-                required
+                inputClassName="flex-1 h-12 bg-card border-border"
+                source="Blog newsletter"
               />
-              <Button type="submit" size="lg" className="h-12 px-8 shrink-0">
-                Subscribe
-              </Button>
-            </form>
+            </div>
             <p className="text-xs text-muted-foreground mt-4">
               No spam, unsubscribe anytime. We respect your privacy.
             </p>

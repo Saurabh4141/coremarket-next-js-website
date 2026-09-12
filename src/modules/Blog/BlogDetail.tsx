@@ -252,7 +252,7 @@ const BlogDetail = ({ data }: { data?: BlogDetailView }) => {
 
             {/* Right Column - Sidebar (30%) */}
             <div className="w-full lg:w-[30%] order-1 lg:order-2">
-              <BlogSidebar />
+              <BlogSidebar popularPosts={blogData.relatedPosts} />
             </div>
           </div>
         </div>

@@ -1,36 +1,139 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# CoreMarket Research
 
-## Getting Started
+Market-research publishing site — browsable industry taxonomy, ~35k market reports,
+blog, and lead-capture forms. Built on the Next.js App Router with a MySQL backend.
 
-First, run the development server:
+---
+
+## Requirements
+
+| | |
+|---|---|
+| Node.js | **22.13+** (22.12 works but ESLint emits an engine warning) |
+| npm | 10+ |
+| MySQL | 8.0 |
+
+## Getting started
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+# 1. Install (see note below — the plain `npm ci` will fail)
+npm ci --legacy-peer-deps
+
+# 2. Configure the database
+cp .env.example .env.local     # then fill in real credentials
+
+# 3. Run
+npm run dev                    # http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+> **Why `--legacy-peer-deps`?** `vaul@0.9.9` (used only by
+> `src/components/ui/drawer.tsx`) declares peer support for React ≤18, but this
+> project runs React 19. The committed lockfile was produced with that flag, so
+> a plain `npm ci` aborts with `ERESOLVE`. Upgrading `vaul` to v1.x would remove
+> the need for it.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Environment variables
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+All are required; there are no defaults. Loaded by Next from `.env.local`.
 
-## Learn More
+| Variable | Description |
+|---|---|
+| `DB_HOST` | MySQL host |
+| `DB_PORT` | MySQL port (typically `3306`) |
+| `DB_USER` | MySQL user |
+| `DB_PASSWORD` | MySQL password |
+| `DB_NAME` | Database name (`core`) |
 
-To learn more about Next.js, take a look at the following resources:
+`.env.local` is git-ignored — **never commit it**. Copy `.env.example` instead.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Scripts
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+| Command | What it does |
+|---|---|
+| `npm run dev` | Dev server (Turbopack) on port 3000 |
+| `npm run build` | Production build — **connects to the database** (see Troubleshooting) |
+| `npm start` | Serve the production build |
+| `npm run lint` | ESLint |
+| `npm test` | Vitest, single run |
+| `npm run test:watch` | Vitest in watch mode |
+| `node scripts/seed-db.mjs` | Idempotent seed: demo blog posts + fills NULL report prices |
 
-## Deploy on Vercel
+## Tech stack
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- **Next.js 16** (App Router, Turbopack) · **React 19** · **TypeScript**
+- **Tailwind CSS 3** + **shadcn/ui** (Radix primitives) — config in `components.json`
+- **framer-motion** (animation), **lucide-react** (icons), **recharts** (charts)
+- **mysql2** connection pool with named placeholders
+- **Vitest** + Testing Library + jsdom
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Project structure
+
+```
+src/
+  app/            App Router: pages, layouts, and API route handlers
+  modules/        Page-level feature code (Home, Reports, Industry, Blog, …)
+  components/     Shared UI — ui/ holds the shadcn primitives
+  lib/
+    db.ts         MySQL pool + shared row-mapping helpers
+    services/     All SQL lives here (reports, industries, blogs, misc)
+  data/           Static//template content and type definitions
+  hooks/          Shared React hooks
+  test/           Vitest setup
+scripts/
+  seed-db.mjs     One-off database seed
+```
+
+**Convention:** components never query the database directly. Pages and route
+handlers call a function in `src/lib/services/`, which owns the SQL.
+
+## Routes
+
+**Pages** — `/`, `/about`, `/blog`, `/blog/[slug]`, `/industry`,
+`/industry/[slug]`, `/services`, `/services/[slug]`, `/checkout`,
+`/checkout/[slug]`, `/contact`, plus legal pages (`/privacy-policy`,
+`/terms-and-conditions`, `/cookie-policy`, `/disclaimer`, `/gdpr`,
+`/refund-policy`).
+
+Report detail accepts two URL shapes:
+`/report/<slug>` and `/report/<industry>/<sub-industry>/<slug>`.
+
+**API**
+
+| Endpoint | Notes |
+|---|---|
+| `GET /api/reports` | Query params: `q`, `industry`, `sub_industry`, `page`, `limit` (max 50) |
+| `GET /api/reports/[slug]` | |
+| `GET /api/industries` · `GET /api/industries/[slug]` | |
+| `GET /api/blogs` · `GET /api/blogs/[slug]` | |
+| `GET /api/testimonials` | |
+| `POST /api/requests` | Lead capture. Requires `name` + `email`; `type` defaults to `contact` |
+
+## Database
+
+Read: `report_master`, `report_desc_master`, `industries_master`,
+`sub_industries_master`, `blog_master`, `testimonials_master`.
+Write: `request_master` (contact form and newsletter signups).
+
+All queries are parameterised via named placeholders — user input never reaches
+SQL as text. Keep it that way when adding queries.
+
+## Troubleshooting
+
+**`npm ci` fails with `ERESOLVE`** — use `npm ci --legacy-peer-deps` (see above).
+
+**`npm run build` fails with `ETIMEDOUT`** — the build prerenders pages that query
+the database, so a slow or unreachable MySQL host fails the build. Confirm
+connectivity and retry; it is usually transient.
+
+**`SELF_SIGNED_CERT_IN_CHAIN` during `npm install`** — a TLS-inspecting firewall
+is re-signing HTTPS traffic and Node does not read the OS certificate store.
+Export the intercepting CA and point Node at it rather than disabling TLS
+verification:
+
+```bash
+# Do NOT use `npm config set strict-ssl false`
+export NODE_EXTRA_CA_CERTS=/path/to/corporate-ca.pem
+```
+
+**Type errors about missing `@/assets/*.png`** — `next-env.d.ts` is generated by
+Next and git-ignored. Run `npm run dev` or `npm run build` once to create it.

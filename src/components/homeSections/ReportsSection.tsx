@@ -183,7 +183,7 @@ export const ReportsSection = () => {
 
         {/* CTA */}
         <AnimatedSection className="text-center mt-12">
-          <Link href="/reports">
+          <Link href="/industry">
             <Button variant="gradient" size="lg">
               Browse All Reports
               <ArrowRight className="w-5 h-5" />

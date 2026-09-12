@@ -10,12 +10,6 @@ const categories = [
   { name: "Data & Analytics", slug: "data-&-analytics" },
 ];
 
-const popularPosts = [
-  { title: "Top 5 Market Research Tools", slug: "market-research-tools" },
-  { title: "Strategies for Competitive Analysis", slug: "competitive-analysis" },
-  { title: "The Rise of E-Commerce Trends", slug: "ecommerce-trends" },
-];
-
 const tags = [
   "Consumer Behavior",
   "2024 Trends",
@@ -24,7 +18,13 @@ const tags = [
   "Industry Insights",
 ];
 
-export const BlogSidebar = () => {
+/** Popular posts come from the page's real post list — hardcoding them here
+ *  previously produced links to slugs that don't exist. */
+export const BlogSidebar = ({
+  popularPosts = [],
+}: {
+  popularPosts?: { title: string; slug: string }[];
+}) => {
   return (
     <aside className="space-y-6 lg:sticky lg:top-24">
       {/* Search Box */}
@@ -61,6 +61,7 @@ export const BlogSidebar = () => {
       </div>
 
       {/* Popular Posts */}
+      {popularPosts.length > 0 && (
       <div className="bg-card rounded-xl border border-border p-5 shadow-sm">
         <h3 className="font-display font-semibold text-foreground mb-4">Popular Posts</h3>
         <ul className="space-y-3">
@@ -77,6 +78,7 @@ export const BlogSidebar = () => {
           ))}
         </ul>
       </div>
+      )}
 
       {/* Tags */}
       <div className="bg-card rounded-xl border border-border p-5 shadow-sm">
